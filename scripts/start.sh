@@ -8,4 +8,4 @@ git pull origin main
 npm install
 
 # Start the app
-exec npm run build && exec npm run start
+npm run build && npm run start
