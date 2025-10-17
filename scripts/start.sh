@@ -5,10 +5,10 @@ cd /home/pi/aly-lamp
 git pull origin main
 
 # Install new dependencies if needed
-/home/pi/.nvm/versions/node/v20.9.0/bin/npm install
+/home/pi/.nvm/versions/node/v22.20.0/bin/npm install
 
 # Build the app
-/home/pi/.nvm/versions/node/v20.9.0/bin/npm build
+/home/pi/.nvm/versions/node/v22.20.0/bin/npm build
 
 # Start the app
-exec /home/pi/.nvm/versions/node/v20.9.0/bin/node /home/pi/aly-lamp/dist/index.js
+exec /home/pi/.nvm/versions/node/v22.20.0/bin/node /home/pi/aly-lamp/dist/index.js
