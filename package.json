@@ -1,0 +1,32 @@
+{
+  "name": "aly-lamp",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/mpolichette/aly-lamp#readme",
+  "bugs": {
+    "url": "https://github.com/mpolichette/aly-lamp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mpolichette/aly-lamp.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc",
+    "dev": "tsc && node dist/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "mqtt": "^5.14.1",
+    "node-lifx-lan": "^0.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.8.1",
+    "typescript": "^5.9.3"
+  }
+}
