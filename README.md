@@ -170,3 +170,72 @@ Example: UID `53FB78...` → RGB(83, 251, 120) → Light green
 - Check M5Stack is publishing to `m5/rfid` topic
 - Verify MQTT message format
 - Monitor console for received messages
+
+## 🧩 Raspberry Pi Deployment
+
+The Raspberry Pi is configured to automatically update and run the `aly-lamp` service on boot.
+
+### 1. Service file
+
+The systemd unit file lives at:
+
+```
+/etc/systemd/system/aly-lamp.service
+```
+
+Example contents:
+
+```ini
+[Unit]
+Description=Aly Lamp (auto-updating)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/home/pi/aly-lamp/start.sh
+WorkingDirectory=/home/pi/aly-lamp
+Restart=always
+User=pi
+Environment=NODE_ENV=production
+Environment=PATH=/home/pi/.nvm/versions/node/v20.9.0/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### 2. Enable and start the service
+
+After creating or updating the file, reload systemd and enable the service:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable aly-lamp
+sudo systemctl start aly-lamp
+```
+
+### 3. Verify and view logs
+
+Check that it’s running:
+
+```bash
+sudo systemctl status aly-lamp
+```
+
+Follow live logs:
+
+```bash
+journalctl -u aly-lamp -f
+```
+
+### 4. What happens on boot
+
+On every reboot, the Pi:
+
+1. Waits for the network to come online.
+2. Runs `/home/pi/aly-lamp/start.sh`, which:
+
+   - Pulls the latest code from GitHub if available.
+   - Installs dependencies (`npm install --omit=dev`).
+   - Starts the Node app (`index.js`) under systemd supervision.
+
+3. Restarts automatically if it crashes or the Pi reboots.
