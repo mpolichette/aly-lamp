@@ -11,4 +11,4 @@ git pull origin main
 /home/pi/.nvm/versions/node/v22.20.0/bin/npm build
 
 # Start the app
-exec /home/pi/.nvm/versions/node/v22.20.0/bin/node /home/pi/aly-lamp/dist/index.js
+exec /home/pi/.nvm/versions/node/v22.20.0/bin/node /home/pi/aly-lamp/dist/main.js
