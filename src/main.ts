@@ -1,8 +1,10 @@
 import mqtt from "mqtt";
-import { colorMap } from "./color-map.js";
 import Lifx from "node-lifx-lan";
-import type { LifxLanColorCSS } from "./types.js";
+import type { LifxLanColorHSB } from "./types.js";
 import { config } from "dotenv";
+import { knownTags, tagColors } from "./constants.js";
+import chalk from "chalk";
+import convertColor from "color-convert";
 
 // Load environment variables from .env file
 config();
@@ -25,31 +27,51 @@ client.on("connect", () => {
 	client.subscribe("m5/rfid");
 });
 
+let prevUid = "";
 client.on("message", (topic, message) => {
-	console.log(`Received message on topic ${topic}: ${message.toString()}`);
 	const uid = message.toString().trim();
-	const color = colorMap[uid] || generateColorFromUID(uid);
+	if (uid === prevUid) return;
+	prevUid = uid;
+
+	// Resolve tag and color w/ fallback to generated color
+	const tag = knownTags[uid];
+	const tagColor = tag ? tagColors[tag] : undefined;
+	const color = tagColor || generateColor(uid);
+	const colorHex = getColorHex(color);
+	const tagName = tag
+		? `[${uid}] ${chalk.hex(colorHex)(tag)}`
+		: `[${uid}] unknown tag`;
+	console.log(`[${topic}] Recieved ${tagName}`);
+	const colorName = tag ? tag : "generated color";
+	console.log(`[lifx] Broadcast setColor: ${chalk.hex(colorHex)(colorName)}`);
 	return setLampColor(color);
 });
 
-const generateColorFromUID = (uid: string): LifxLanColorCSS => {
-	if (uid.length < 6) return { css: "white" };
-	const r = parseInt(uid.slice(0, 2), 16);
-	const g = parseInt(uid.slice(2, 4), 16);
-	const b = parseInt(uid.slice(4, 6), 16);
-	const css = `rgb(${r}, ${g}, ${b})`;
-	console.log(`Generated color ${css} from UID: ${uid}`);
-	return { css, brightness: 1.0, kelvin: 3500 };
+const generateColor = (uid: string): LifxLanColorHSB => {
+	// Use a simple hash to generate consistent hue from UID
+	let hash = 0;
+	for (let i = 0; i < uid.length; i++) {
+		hash = ((hash << 5) - hash + uid.charCodeAt(i)) & 0xffffffff;
+	}
+	// Convert hash to hue (0-360)
+	const hue = (Math.abs(hash) % 360) / 360;
+	return { hue, saturation: 1.0, brightness: 0.5 };
 };
 
-const setLampColor = (color: LifxLanColorCSS) => {
+const getColorHex = (color: LifxLanColorHSB): string => {
+	console.log(JSON.stringify(color));
+	const h = Math.round(color.hue * 360);
+	const s = Math.round((color.saturation || 1) * 100);
+	const b = Math.round((color.brightness || 1) * 100);
+	const hex = convertColor.hsl.hex(h, s, b);
+	console.log(h, s, b, hex);
+	return hex;
+};
+
+const setLampColor = (color: LifxLanColorHSB) => {
 	Lifx.turnOnBroadcast({
 		color,
-	})
-		.then(() => {
-			console.log("Done!");
-		})
-		.catch((error) => {
-			console.error(error);
-		});
+	}).catch((error) => {
+		console.error(error);
+	});
 };

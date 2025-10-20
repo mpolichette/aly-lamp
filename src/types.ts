@@ -3,7 +3,7 @@
 export interface LifxLanColorHSB {
 	hue: number; // 0.0 to 1.0
 	saturation: number; // 0.0 to 1.0
-	brightness: number; // 0.0 to 1.0
+	brightness?: number; // 0.0 to 1.0
 	kelvin?: number; // 1500 to 9000, default: 3500
 }
 
