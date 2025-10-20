@@ -59,12 +59,10 @@ const generateColor = (uid: string): LifxLanColorHSB => {
 };
 
 const getColorHex = (color: LifxLanColorHSB): string => {
-	console.log(JSON.stringify(color));
 	const h = Math.round(color.hue * 360);
 	const s = Math.round((color.saturation || 1) * 100);
 	const b = Math.round((color.brightness || 1) * 100);
 	const hex = convertColor.hsl.hex(h, s, b);
-	console.log(h, s, b, hex);
 	return hex;
 };
 
